@@ -44,6 +44,58 @@ const Layout = () => {
                     >
                       Profile
                     </Link>
+                    <Link
+                      to="/playlists"
+                      className="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium"
+                    >
+                      Playlists
+                    </Link>
+                    <Link
+                      to="/bookmarks"
+                      className="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium"
+                    >
+                      Bookmarks
+                    </Link>
+                    <Link
+                      to="/likes"
+                      className="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium"
+                    >
+                      Likes
+                    </Link>
+                    <Link
+                      to="/subscriptions"
+                      className="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium"
+                    >
+                      Subscriptions
+                    </Link>
+                    <Link
+                      to="/recommendations"
+                      className="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium"
+                    >
+                      Recommendations
+                    </Link>
+                    <Link
+                      to="/continue"
+                      className="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium"
+                    >
+                      Continue
+                    </Link>
+                    <Link
+                      to="/posts"
+                      className="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium"
+                    >
+                      Posts
+                    </Link>
+                    {user.role === "instructor" && (
+                      <>
+                        <Link
+                          to="/videos/upload"
+                          className="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium"
+                        >
+                          Upload
+                        </Link>
+                      </>
+                    )}
                   </>
                 )}
               </div>

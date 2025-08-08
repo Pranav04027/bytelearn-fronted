@@ -1,11 +1,9 @@
 
-import axios from "axios";
-
-const API_BASE_URL = "/api/v1/videos"; // Base URL for video APIs
+import axios from "./axios.js";
 
 export const getAllVideos = async () => {
   try {
-    const response = await axios.get(`${API_BASE_URL}/getallvideos`);
+    const response = await axios.get(`/videos/getallvideos`);
     return response.data;
   } catch (error) {
     throw error.response?.data || error.message;
@@ -14,7 +12,7 @@ export const getAllVideos = async () => {
 
 export const getVideoById = async (videoId) => {
   try {
-    const response = await axios.get(`${API_BASE_URL}/v/${videoId}`);
+    const response = await axios.get(`/videos/v/${videoId}`);
     return response.data;
   } catch (error) {
     throw error.response?.data || error.message;
@@ -23,7 +21,7 @@ export const getVideoById = async (videoId) => {
 
 export const uploadVideo = async (formData) => {
   try {
-    const response = await axios.post(`${API_BASE_URL}/uploadvideo`, formData, {
+    const response = await axios.post(`/videos/uploadvideo`, formData, {
       headers: {
         "Content-Type": "multipart/form-data",
       },
