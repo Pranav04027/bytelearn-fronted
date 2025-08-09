@@ -1,11 +1,9 @@
 
-import axios from "axios";
-
-const API_BASE_URL = "/api/v1/playlists"; // Base URL for playlist APIs
+import axios from "./axios.js";
 
 export const getMyPlaylists = async () => {
   try {
-    const response = await axios.get(`${API_BASE_URL}/my-playlists`);
+    const response = await axios.get(`/playlists/my-playlists`);
     return response.data;
   } catch (error) {
     throw error.response?.data || error.message;
@@ -14,16 +12,25 @@ export const getMyPlaylists = async () => {
 
 export const getUserPlaylists = async (userId) => {
   try {
-    const response = await axios.get(`${API_BASE_URL}/p/${userId}`);
+    const response = await axios.get(`/playlists/p/${userId}`);
     return response.data;
   } catch (error) {
     throw error.response?.data || error.message;
   }
 };
 
-export const editPlaylist = async (playlistId, videoId, data) => {
+export const createPlaylist = async (payload) => {
   try {
-    const response = await axios.patch(`${API_BASE_URL}/p/${playlistId}/v/${videoId}`, data);
+    const response = await axios.post(`/playlists/create-playlist`, payload);
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error.message;
+  }
+};
+
+export const addVideoToPlaylist = async (playlistId, videoId) => {
+  try {
+    const response = await axios.patch(`/playlists/p/${playlistId}/v/${videoId}`);
     return response.data;
   } catch (error) {
     throw error.response?.data || error.message;

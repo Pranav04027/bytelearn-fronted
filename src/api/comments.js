@@ -1,11 +1,9 @@
 
-import axios from "axios";
+import axios from "./axios.js";
 
-const API_BASE_URL = "/api/v1/comments"; // Base URL for comment APIs
-
-export const getVideoComments = async (videoId) => {
+export const getVideoComments = async (videoId, page = 1, limit = 10) => {
   try {
-    const response = await axios.get(`${API_BASE_URL}/getvideocomments/${videoId}`);
+    const response = await axios.get(`/comments/getvideocomments/${videoId}?page=${page}&limit=${limit}`);
     return response.data;
   } catch (error) {
     throw error.response?.data || error.message;
@@ -14,7 +12,25 @@ export const getVideoComments = async (videoId) => {
 
 export const addComment = async (videoId, commentData) => {
   try {
-    const response = await axios.post(`${API_BASE_URL}/comment/${videoId}`, commentData);
+    const response = await axios.post(`/comments/comment/${videoId}`, commentData);
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error.message;
+  }
+};
+
+export const updateComment = async (commentId, commentData) => {
+  try {
+    const response = await axios.post(`/comments/updatecomment/${commentId}`, commentData);
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error.message;
+  }
+};
+
+export const deleteComment = async (commentId) => {
+  try {
+    const response = await axios.post(`/comments/deletecomment/${commentId}`);
     return response.data;
   } catch (error) {
     throw error.response?.data || error.message;

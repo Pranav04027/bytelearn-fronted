@@ -1,38 +1,36 @@
 
-import axios from "axios";
-
-const API_BASE_URL = "/api/v1/likes"; // Base URL for likes APIs
+import axios from "./axios.js";
 
 export const getLikedVideos = async () => {
   try {
-    const response = await axios.get(`${API_BASE_URL}/likedvideos`);
+    const response = await axios.get(`/likes/likedvideos`);
     return response.data;
   } catch (error) {
     throw error.response?.data || error.message;
   }
 };
 
-export const likeVideo = async (videoId) => {
+export const toggleLikeVideo = async (videoId) => {
   try {
-    const response = await axios.post(`${API_BASE_URL}/likevideo/${videoId}`);
+    const response = await axios.post(`/likes/likevideo/${videoId}`);
     return response.data;
   } catch (error) {
     throw error.response?.data || error.message;
   }
 };
 
-export const likeComment = async (commentId) => {
+export const toggleLikeComment = async (commentId) => {
   try {
-    const response = await axios.post(`${API_BASE_URL}/likecomment/${commentId}`);
+    const response = await axios.post(`/likes/likecomment/${commentId}`);
     return response.data;
   } catch (error) {
     throw error.response?.data || error.message;
   }
 };
 
-export const likeTweet = async (tweetId) => {
+export const toggleLikePost = async (postId) => {
   try {
-    const response = await axios.post(`${API_BASE_URL}/liketweet/${tweetId}`);
+    const response = await axios.post(`/likes/likepost/${postId}`);
     return response.data;
   } catch (error) {
     throw error.response?.data || error.message;

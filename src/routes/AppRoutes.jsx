@@ -16,6 +16,7 @@ import EditCover from "../pages/Profile/EditCover.jsx";
 import UserChannel from "../pages/Profile/UserChannel.jsx";
 import MyPlaylists from "../pages/Playlists/MyPlaylists.jsx";
 import UserPlaylists from "../pages/Playlists/UserPlaylists.jsx";
+import PlaylistDetail from "../pages/Playlists/PlaylistDetail.jsx";
 import Bookmarks from "../pages/Bookmarks/Bookmarks.jsx";
 import LikedVideos from "../pages/Likes/LikedVideos.jsx";
 import Subscriptions from "../pages/Subscriptions/Subscriptions.jsx";
@@ -79,6 +80,14 @@ const AppRoutes = () => {
           element={
             <ProtectedRoute>
               <MyPlaylists />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="playlists/:playlistId"
+          element={
+            <ProtectedRoute>
+              <PlaylistDetail />
             </ProtectedRoute>
           }
         />
