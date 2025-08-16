@@ -1,7 +1,17 @@
 import axios from "axios";
+import { emit } from "../utils/emitter.js";
+let isUserLoggedOut = false;
+
+export function setUserLoggedOut(val) {
+  isUserLoggedOut = val;
+}
+
+const devBase = import.meta.env.VITE_API_BASE_URL || "/api/v1";
+const prodBase = import.meta.env.VITE_API_BASE_URL || "http://localhost:3000/api/v1";
 
 const instance = axios.create({
-  baseURL: import.meta.env.DEV ? "/api/v1" : (import.meta.env.VITE_API_BASE_URL || "http://localhost:3000/api/v1"),
+  // In dev, prefer VITE_API_BASE_URL if provided (e.g., http://localhost:8000/api/v1) to avoid proxy issues with large uploads
+  baseURL: import.meta.env.DEV ? devBase : prodBase,
   withCredentials: true,
 });
 
@@ -26,11 +36,20 @@ instance.interceptors.response.use(
 
     // Only handle 401
     if (status !== 401) {
+      try {
+        const msg = error.response?.data?.message || error.message || "Request failed";
+        emit("toast", { type: "error", message: msg });
+      } catch (_) {}
       return Promise.reject(error);
     }
 
     // Don't try to refresh for the refresh endpoint itself
     if (url.includes("/users/refresh-token")) {
+      return Promise.reject(error);
+    }
+
+    // Prevent refresh if user is logged out
+    if (isUserLoggedOut) {
       return Promise.reject(error);
     }
 
@@ -60,6 +79,10 @@ instance.interceptors.response.use(
       isRefreshing = false;
       pendingRequests = [];
       // Let caller handle (e.g., UI shows logged-out state)
+      try {
+        const msg = refreshErr.response?.data?.message || refreshErr.message || "Authentication required";
+        emit("toast", { type: "error", message: msg });
+      } catch (_) {}
       return Promise.reject(refreshErr);
     }
   }

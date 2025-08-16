@@ -10,9 +10,13 @@ import VideoList from "../pages/Videos/VideoList.jsx";
 import VideoDetail from "../pages/Videos/VideoDetail.jsx";
 import UploadVideo from "../pages/Videos/UploadVideo.jsx";
 import Dashboard from "../pages/Dashboard/Dashboard.jsx";
+import InstructorDashboard from "../pages/Dashboard/InstructorDashboard.jsx";
+import LearnerDashboard from "../pages/Dashboard/LearnerDashboard.jsx";
 import MyProfile from "../pages/Profile/MyProfile.jsx";
+import EditProfile from "../pages/Profile/EditProfile.jsx";
 import EditAvatar from "../pages/Profile/EditAvatar.jsx";
 import EditCover from "../pages/Profile/EditCover.jsx";
+import History from "../pages/History/History.jsx";
 import UserChannel from "../pages/Profile/UserChannel.jsx";
 import MyPlaylists from "../pages/Playlists/MyPlaylists.jsx";
 import UserPlaylists from "../pages/Playlists/UserPlaylists.jsx";
@@ -27,6 +31,7 @@ import Posts from "../pages/Posts/Posts.jsx";
 import CreateQuiz from "../pages/Quizzes/CreateQuiz.jsx";
 import TakeQuiz from "../pages/Quizzes/TakeQuiz.jsx";
 import NotFound from "../pages/NotFound.jsx";
+import Search from "../pages/Search/Search.jsx";
 
 const AppRoutes = () => {
   return (
@@ -39,6 +44,7 @@ const AppRoutes = () => {
 
         {/* Public content */}
         <Route path="videos/:id" element={<VideoDetail />} />
+        <Route path="search" element={<Search />} />
         <Route path="u/:username" element={<UserChannel />} />
         <Route path="health" element={<Healthcheck />} />
 
@@ -52,10 +58,34 @@ const AppRoutes = () => {
           }
         />
         <Route
+          path="instructor"
+          element={
+            <RoleRoute role="instructor">
+              <InstructorDashboard />
+            </RoleRoute>
+          }
+        />
+        <Route
+          path="learner/dashboard"
+          element={
+            <ProtectedRoute>
+              <LearnerDashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
           path="profile"
           element={
             <ProtectedRoute>
               <MyProfile />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="profile/edit"
+          element={
+            <ProtectedRoute>
+              <EditProfile />
             </ProtectedRoute>
           }
         />
@@ -140,6 +170,14 @@ const AppRoutes = () => {
           element={
             <ProtectedRoute>
               <Posts />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="history"
+          element={
+            <ProtectedRoute>
+              <History />
             </ProtectedRoute>
           }
         />

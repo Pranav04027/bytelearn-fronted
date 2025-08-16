@@ -1,11 +1,19 @@
+import axios from "./axios.js";
 
-import axios from "axios";
-
-const API_BASE_URL = "/api/v1/progress"; // Base URL for progress APIs
+const API_BASE_URL = "/progress"; // Base URL for progress APIs
 
 export const getContinueWatching = async () => {
   try {
     const response = await axios.get(`${API_BASE_URL}/continue`);
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error.message;
+  }
+};
+
+export const getProgressHistory = async () => {
+  try {
+    const response = await axios.get(`${API_BASE_URL}/get`);
     return response.data;
   } catch (error) {
     throw error.response?.data || error.message;

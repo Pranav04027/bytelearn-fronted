@@ -1,7 +1,6 @@
+import axios from "./axios.js";
 
-import axios from "axios";
-
-const API_BASE_URL = "/api/v1/recommendations"; // Base URL for recommendations APIs
+const API_BASE_URL = "/recommendations"; // Base URL for recommendations APIs
 
 export const getRecommendedVideos = async () => {
   try {

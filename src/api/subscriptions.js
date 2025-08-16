@@ -1,7 +1,6 @@
+import axios from "./axios.js";
 
-import axios from "axios";
-
-const API_BASE_URL = "/api/v1/subscriptions"; // Base URL for subscription APIs
+const API_BASE_URL = "/subscriptions"; // base is set in axios instance
 
 export const getSubscribedChannels = async (subscriberId) => {
   try {

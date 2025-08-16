@@ -1,5 +1,6 @@
 import { createContext, useEffect, useState } from "react";
 import { fetchCurrentUser, loginUser, logoutUser, refreshAccessToken } from "../api/auth.js";
+import { setUserLoggedOut } from "../api/axios.js";
 
 export const AuthContext = createContext();
 
@@ -10,6 +11,7 @@ const AuthProvider = ({ children }) => {
   const login = async (credentials) => {
     try {
       await loginUser(credentials); // just sets cookies
+      setUserLoggedOut(false);
       // Now fetch user info
       const response = await fetchCurrentUser();
       setUser(response.data);
@@ -23,14 +25,17 @@ const AuthProvider = ({ children }) => {
     try {
       await logoutUser();
       setUser(null);
+      setUserLoggedOut(true);
     } catch (error) {
       console.error("Logout error:", error);
       setUser(null);
+      setUserLoggedOut(true);
     }
   };
 
   const fetchCurrentUserData = async () => {
     try {
+      setUserLoggedOut(false);
       const response = await fetchCurrentUser();
       setUser(response.data);
     } catch (err) {
@@ -38,13 +43,16 @@ const AuthProvider = ({ children }) => {
       if (err?.statusCode === 401 || err?.status === 401) {
         try {
           await refreshAccessToken();
+          setUserLoggedOut(false);
           const response = await fetchCurrentUser();
           setUser(response.data);
         } catch (refreshErr) {
           setUser(null);
+          setUserLoggedOut(true);
         }
       } else {
         setUser(null);
+        setUserLoggedOut(true);
       }
     } finally {
       setLoading(false);

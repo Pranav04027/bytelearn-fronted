@@ -1,17 +1,43 @@
-import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import { getAllVideos } from "../../api/videos.js";
+import { useEffect, useMemo, useState } from "react";
+import { Link, useSearchParams } from "react-router-dom";
+import { searchVideos } from "../../api/videos.js";
+import { getQuizExistsByVideoId } from "../../api/quizzes.js";
+
+const Chip = ({ children }) => (
+  <span className="inline-flex items-center gap-1 rounded-full bg-[#f3e7e8] text-[#1b0e0e] px-2 py-0.5 text-[11px] font-medium">
+    {children}
+  </span>
+);
 
 const VideoCard = ({ video }) => {
+  const [quizExists, setQuizExists] = useState(undefined);
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      try {
+        const exists = await getQuizExistsByVideoId(video._id);
+        if (mounted) setQuizExists(!!exists);
+      } catch {
+        if (mounted) setQuizExists(false);
+      }
+    })();
+    return () => { mounted = false; };
+  }, [video._id]);
+
   return (
-    <Link to={`/videos/${video._id}`} className="block bg-white rounded-lg shadow hover:shadow-md transition p-3">
-      <img src={video.thumbnail} alt={video.title} className="w-full h-40 object-cover rounded" />
-      <div className="mt-3">
-        <h3 className="text-sm font-semibold text-gray-900 line-clamp-2">{video.title}</h3>
-        <p className="text-xs text-gray-500 mt-1 line-clamp-2">{video.description}</p>
-        <div className="text-xs text-gray-400 mt-2 flex justify-between">
-          <span className="capitalize">{video.category}</span>
-          <span className="capitalize">{video.difficulty}</span>
+    <Link to={`/videos/${video._id}`} className="block rounded-xl bg-white/70 hover:bg-white transition shadow-sm hover:shadow-md p-3">
+      <img src={video.thumbnail} alt={video.title} className="w-full h-44 object-cover rounded-lg" />
+      <div className="mt-3 space-y-2">
+        <h3 className="text-[15px] font-semibold text-[#1b0e0e] leading-snug line-clamp-2">{video.title}</h3>
+        <p className="text-[12px] text-[#1b0e0e]/70 line-clamp-2">{video.description}</p>
+        <div className="flex items-center gap-2 flex-wrap">
+          <Chip>{video.category}</Chip>
+          <Chip>{video.difficulty}</Chip>
+          {quizExists === undefined ? null : quizExists ? (
+            <span className="inline-block px-3 py-1 rounded-full text-xs bg-green-100 text-green-700 font-semibold">Quiz available</span>
+          ) : (
+            <span className="inline-block px-3 py-1 rounded-full text-xs bg-[#f3e7e8] text-[#1b0e0e]">No quiz</span>
+          )}
         </div>
       </div>
     </Link>
@@ -22,30 +48,53 @@ const VideoList = () => {
   const [videos, setVideos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [total, setTotal] = useState(0);
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const limit = 12;
+  const page = useMemo(() => {
+    const p = parseInt(searchParams.get("page") || "1", 10);
+    return Number.isNaN(p) || p < 1 ? 1 : p;
+  }, [searchParams]);
 
   useEffect(() => {
+    let mounted = true;
     const load = async () => {
+      setLoading(true);
+      setError("");
       try {
-        const res = await getAllVideos();
-        // ApiResponse shape: { statusCode, data: { results, total, ... }, message, success }
+        const res = await searchVideos({ query: undefined, page, limit });
         const results = res?.data?.results || [];
+        const t = res?.data?.total ?? results.length;
+        if (!mounted) return;
         setVideos(results);
+        setTotal(typeof t === "number" ? t : 0);
       } catch (e) {
+        if (!mounted) return;
         setError(typeof e === "string" ? e : e?.message || "Failed to load videos");
       } finally {
-        setLoading(false);
+        if (mounted) setLoading(false);
       }
     };
     load();
-  }, []);
+    return () => { mounted = false; };
+  }, [page]);
+
+  const totalPages = Math.max(1, Math.ceil(total / limit));
+  const goToPage = (p) => {
+    const next = Math.min(Math.max(1, p), totalPages || 1);
+    setSearchParams(next === 1 ? {} : { page: String(next) });
+  };
 
   return (
     <div className="max-w-7xl mx-auto">
-      <div className="bg-white shadow rounded-lg p-6">
-        <h1 className="text-2xl font-bold text-gray-900 mb-6">Videos</h1>
+      <div className="p-4">
+        <div className="flex flex-wrap justify-between gap-3">
+          <p className="text-[#1b0e0e] tracking-light text-[32px] font-bold leading-tight">Videos</p>
+        </div>
 
         {loading && (
-          <div className="text-center py-12 text-gray-600">Loading videos...</div>
+          <div className="text-center py-12 text-[#1b0e0e]/70">Loading videos...</div>
         )}
 
         {error && !loading && (
@@ -53,24 +102,37 @@ const VideoList = () => {
         )}
 
         {!loading && !error && videos.length === 0 && (
-          <div className="text-center py-12">
-            <div className="text-gray-500">
-              <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
-              </svg>
-              <h3 className="mt-2 text-sm font-medium text-gray-900">No videos yet</h3>
-              <p className="mt-1 text-sm text-gray-500">
-                Videos will appear here once they are uploaded.
-              </p>
-            </div>
-          </div>
+          <div className="text-center py-12 text-[#1b0e0e]/70">No videos yet.</div>
         )}
 
         {!loading && !error && videos.length > 0 && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-4">
             {videos.map((v) => (
               <VideoCard key={v._id} video={v} />
             ))}
+          </div>
+        )}
+
+        {/* Pagination controls */}
+        {!loading && !error && totalPages > 1 && (
+          <div className="flex items-center justify-center gap-3 mt-6">
+            <button
+              className="h-9 px-3 rounded-lg bg-[#f3e7e8] text-[#1b0e0e] text-sm font-medium disabled:opacity-50"
+              onClick={() => goToPage(page - 1)}
+              disabled={page <= 1}
+            >
+              Prev
+            </button>
+            <span className="text-[#1b0e0e]/80 text-sm">
+              Page {Math.min(page, totalPages)} of {totalPages}
+            </span>
+            <button
+              className="h-9 px-3 rounded-lg bg-[#f3e7e8] text-[#1b0e0e] text-sm font-medium disabled:opacity-50"
+              onClick={() => goToPage(page + 1)}
+              disabled={page >= totalPages}
+            >
+              Next
+            </button>
           </div>
         )}
       </div>

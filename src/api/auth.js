@@ -98,6 +98,15 @@ export const getWatchHistory = async () => {
   }
 };
 
+export const getUserById = async (userId) => {
+  try {
+    const response = await axios.get(`/users/${userId}`);
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error.message;
+  }
+};
+
 export const getLearnerDashboard = async () => {
   try {
     const response = await axios.get("/learner/dashboard");

@@ -1,7 +1,6 @@
+import axios from "./axios.js";
 
-import axios from "axios";
-
-const API_BASE_URL = "/api/v1/bookmarks"; // Base URL for bookmarks APIs
+const API_BASE_URL = "/bookmarks"; // base is set in axios instance
 
 export const getMyBookmarks = async () => {
   try {

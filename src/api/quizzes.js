@@ -1,11 +1,10 @@
+import axios from "./axios.js";
 
-import axios from "axios";
+const API_BASE_URL = "/quizzes"; // Base URL for quizzes APIs
 
-const API_BASE_URL = "/api/v1/quizzes"; // Base URL for quizzes APIs
-
-export const createQuiz = async (quizData) => {
+export const createQuiz = async (videoId, quizData) => {
   try {
-    const response = await axios.post(`${API_BASE_URL}/create`, quizData);
+    const response = await axios.post(`${API_BASE_URL}/create/${videoId}`, quizData);
     return response.data;
   } catch (error) {
     throw error.response?.data || error.message;
@@ -17,6 +16,10 @@ export const getQuizByVideoId = async (videoId) => {
     const response = await axios.get(`${API_BASE_URL}/${videoId}`);
     return response.data;
   } catch (error) {
+    if (error.response && error.response.status === 404) {
+      // Quiz does not exist
+      return null;
+    }
     throw error.response?.data || error.message;
   }
 };
@@ -27,5 +30,14 @@ export const submitQuiz = async (videoId, submissionData) => {
     return response.data;
   } catch (error) {
     throw error.response?.data || error.message;
+  }
+};
+
+export const getQuizExistsByVideoId = async (videoId) => {
+  try {
+    const response = await axios.get(`/quizzes/isquiz/${videoId}`);
+    return !!(response.data && response.data.data && response.data.data.exists);
+  } catch (error) {
+    return false;
   }
 };
