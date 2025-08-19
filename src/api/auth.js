@@ -115,3 +115,12 @@ export const getLearnerDashboard = async () => {
     throw error.response?.data || error.message;
   }
 };
+
+export const changePassword = async (payload) => {
+  try {
+    const response = await axios.post("/users/change-password", payload);
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error.message;
+  }
+};
